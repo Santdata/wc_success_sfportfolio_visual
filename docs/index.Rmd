@@ -1,0 +1,687 @@
+---
+title: "World cup success index (WCS_I) Visuals"
+author: "Santiago Florimonte"
+output:
+  html_document:
+    theme: flatly
+    toc: yes
+    toc_depth: 3
+    toc_float:
+      smooth_scroll: yes
+      collapsed: yes
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE, warning=FALSE)
+```
+
+```{css}
+  #TOC {
+    max-width: 200px;
+    }
+  
+```
+
+```{r libraries set-up, include=FALSE}
+
+library(DT) # datatable()
+library(tidyverse)
+library(png) # readPNG() 
+library(dplyr) # anti_join(), inner_join(), left_join(), bind_cols()
+library(grid) # rasterGrob()
+library(rvest) # read_html(), html_nodes(), html_text(), html_attr()
+library(stringr) # str_detect() 
+library(reactable) # reactable()
+library(ggplot2)
+library(openxlsx) # read.xlsx(), write.xlsx()
+library(sf) # st_as_sf() ; st_transform() ; st_geometry()
+library(rnaturalearth) # ne_countries()  
+library(rnaturalearthdata)
+library(plotly) # plot_geo()
+library(magick) # image_trim(), image_read(), image_scale() 
+library(cowplot) #draw_image()
+# HTML htmltools
+# aggregate() stats
+# as.raster() grDevices 
+
+
+```
+
+```{r initial datasets, eval=FALSE}
+
+wc_22 <- lapply(list(wc_links_gs[1], wc_links_r16[1], wc_links_winners[1]), function(i){
+  rbindlist(i)
+}) %>% rbindlist() %>% rename( wc_countries = '.') %>%  count(wc_countries) 
+
+wc_18 <- lapply(list(wc_links_gs[2], wc_links_r16[2], wc_links_winners[2]), function(i){
+  rbindlist(i)
+}) %>% rbindlist() %>% rename( wc_countries = '.') %>%  count(wc_countries) 
+
+wc_14 <- lapply(list(wc_links_gs[3], wc_links_r16[3], wc_links_winners[3]), function(i){
+  rbindlist(i)
+}) %>% rbindlist() %>% rename( wc_countries = '.') %>%  count(wc_countries) 
+
+wc_10 <- lapply(list(wc_links_gs[4], wc_links_r16[4], wc_links_winners[4]), function(i){
+  rbindlist(i)
+}) %>% rbindlist() %>% rename( wc_countries = '.') %>%  count(wc_countries) 
+
+wc_06 <- lapply(list(wc_links_gs[5], wc_links_r16[5], wc_links_winners[5]), function(i){
+  rbindlist(i)
+}) %>% rbindlist() %>% rename( wc_countries = '.') %>%  count(wc_countries) 
+
+wc_02 <- lapply(list(wc_links_gs[6], wc_links_r16[6], wc_links_winners[6]), function(i){
+  rbindlist(i)
+}) %>% rbindlist() %>% rename(wc_countries = '.') %>%  count(wc_countries) 
+
+wc_98 <- lapply(list(wc_links_gs[7], wc_links_r16[7], wc_links_winners[7]), function(i){
+  rbindlist(i)
+}) %>% rbindlist() %>% rename(wc_countries = '.') %>%  count(wc_countries) 
+
+# wc_98 -------
+
+s_points <- numeric(0) 
+
+for (i in wc_98$n) {
+  if (i == 1 ) {
+  s_points <- c(s_points, 0.2)
+} else if (i == 2) {
+  s_points <- c(s_points, 0.36)
+} else if (i == 3) {
+  s_points <- c(s_points, 0.52)
+} else if (i == 4) {
+  s_points <- c(s_points, 0.68)
+} else if (i == 5) {
+  s_points <- c(s_points, 0.84)
+} else if (i == 6) {
+  s_points <- c(s_points, 1)
+}
+  }
+
+wc_98 <- cbind(wc_98, s_points, label = rep("wc_98", 32))
+
+# wc_02 -------
+
+s_points <- numeric(0) 
+
+for (i in wc_02$n) {
+  if (i == 1 ) {
+  s_points <- c(s_points, 0.2)
+} else if (i == 2) {
+  s_points <- c(s_points, 0.36)
+} else if (i == 3) {
+  s_points <- c(s_points, 0.52)
+} else if (i == 4) {
+  s_points <- c(s_points, 0.68)
+} else if (i == 5) {
+  s_points <- c(s_points, 0.84)
+} else if (i == 6) {
+  s_points <- c(s_points, 1)
+}
+  }
+
+wc_02 <- cbind(wc_02, s_points, label = rep("wc_02", 32))
+
+# wc_06 -------
+
+s_points <- numeric(0) 
+
+for (i in wc_06$n) {
+  if (i == 1 ) {
+  s_points <- c(s_points, 0.2)
+} else if (i == 2) {
+  s_points <- c(s_points, 0.36)
+} else if (i == 3) {
+  s_points <- c(s_points, 0.52)
+} else if (i == 4) {
+  s_points <- c(s_points, 0.68)
+} else if (i == 5) {
+  s_points <- c(s_points, 0.84)
+} else if (i == 6) {
+  s_points <- c(s_points, 1)
+}
+  }
+
+wc_06 <- cbind(wc_06, s_points, label = rep("wc_06", 32))
+
+# wc_10 -------
+
+s_points <- numeric(0) 
+
+for (i in wc_10$n) {
+  if (i == 1 ) {
+  s_points <- c(s_points, 0.2)
+} else if (i == 2) {
+  s_points <- c(s_points, 0.36)
+} else if (i == 3) {
+  s_points <- c(s_points, 0.52)
+} else if (i == 4) {
+  s_points <- c(s_points, 0.68)
+} else if (i == 5) {
+  s_points <- c(s_points, 0.84)
+} else if (i == 6) {
+  s_points <- c(s_points, 1)
+}
+  }
+
+wc_10 <- cbind(wc_10, s_points, label = rep("wc_10", 32))
+
+# wc_14 -------
+
+s_points <- numeric(0) 
+
+for (i in wc_14$n) {
+  if (i == 1 ) {
+  s_points <- c(s_points, 0.2)
+} else if (i == 2) {
+  s_points <- c(s_points, 0.36)
+} else if (i == 3) {
+  s_points <- c(s_points, 0.52)
+} else if (i == 4) {
+  s_points <- c(s_points, 0.68)
+} else if (i == 5) {
+  s_points <- c(s_points, 0.84)
+} else if (i == 6) {
+  s_points <- c(s_points, 1)
+}
+  }
+
+wc_14 <- cbind(wc_14, s_points, label = rep("wc_14", 32))
+
+# wc_18 -------
+
+s_points <- numeric(0) 
+
+for (i in wc_18$n) {
+  if (i == 1 ) {
+  s_points <- c(s_points, 0.2)
+} else if (i == 2) {
+  s_points <- c(s_points, 0.36)
+} else if (i == 3) {
+  s_points <- c(s_points, 0.52)
+} else if (i == 4) {
+  s_points <- c(s_points, 0.68)
+} else if (i == 5) {
+  s_points <- c(s_points, 0.84)
+} else if (i == 6) {
+  s_points <- c(s_points, 1)
+}
+  }
+
+wc_18 <- cbind(wc_18, s_points, label = rep("wc_18", 32))
+
+# wc_22 -------
+
+s_points <- numeric(0) 
+
+for (i in wc_22$n) {
+  if (i == 1 ) {
+  s_points <- c(s_points, 0.2)
+} else if (i == 2) {
+  s_points <- c(s_points, 0.36)
+} else if (i == 3) {
+  s_points <- c(s_points, 0.52)
+} else if (i == 4) {
+  s_points <- c(s_points, 0.68)
+} else if (i == 5) {
+  s_points <- c(s_points, 0.84)
+} else if (i == 6) {
+  s_points <- c(s_points, 1)
+}
+  }
+
+wc_22 <- cbind(wc_22, s_points, label = rep("wc_22", 32))
+
+
+wc_all_s_points <- rbind(wc_98, wc_02, wc_06, wc_10, wc_14, wc_18, wc_22) %>% select(.,  - c('n', 'label')) %>% group_by(wc_countries) %>% summarise('sum_s_points' = sum(s_points)) %>% arrange(desc(sum_s_points))
+
+wc_all_labeled_long <- rbind(wc_98, wc_02, wc_06, wc_10, wc_14, wc_18, wc_22)
+
+wc_all_labeled_wide <- spread(wc_all_labeled, key = label, value = s_points) %>%
+  replace_na(list(wc_98 = 0, wc_02 = 0, wc_06 = 0, wc_10 = 0, wc_14 = 0, wc_18 = 0, wc_22 = 0))
+
+wc_all_labeled_wide_sum <- aggregate(wc_all_labeled.1[,2:9], 
+          by = list(wc_countries = wc_all_labeled.1$wc_countries), FUN = sum)
+
+
+  # Import to spreadsheets, just in case... Thanks Lorenzo.
+
+# path_xlsx.s <- "C://Users//santi//Desktop//saint_analytics//projects_&_work//saint_football//wc_success"
+# 
+# list_datasets <- list(wc_all_s_points, wc_all_labeled_long, wc_all_labeled_wide, 
+#                       wc_all_labeled_wide_sum)
+# 
+# lapply(list_datasets, function(o){
+#   write.xlsx(o, path_xlsx.s)  
+# })
+
+```
+
+## **Summary**
+
+
+ * **Context**
+    * This project belongs to **Santiago Florimonte's portfolio**, and is part of **saint_analytics**, a business idea in the making.
+ * **What you'll find**
+    * Visuals around a success index for the most popular sports competition of all: The FIFA world cup
+    * Tables containing datasets for the visuals, sources, and credits
+
+
+```{r initial datasets from desktop}
+
+wc_all_s_points <- read.xlsx("C://Users//santi//Desktop//saint_analytics//projects_&_work//saint_sports//wc_success//wc_all_s_points.xlsx")
+
+wc_all_labeled_long <- read.xlsx("C://Users//santi//Desktop//saint_analytics//projects_&_work//saint_sports//wc_success//wc_all_labeled_long.xlsx")
+
+wc_all_labeled_wide <- read.xlsx("C://Users//santi//Desktop//saint_analytics//projects_&_work//saint_sports//wc_success//wc_all_labeled_wide.xlsx")
+
+wc_all_labeled_wide_sum <- read.xlsx("C://Users//santi//Desktop//saint_analytics//projects_&_work//saint_sports//wc_success//wc_all_labeled_wide_sum.xlsx")
+
+```
+
+```{r index n image dataset}
+arg_expl_summ_df <- data.frame(summ = c("~ Argentina qualified\n~ 0.2", 
+                                    "~ Came on top of group C\n~ 0.2 + 0.16 = 0.36", 
+                                    "~ Won against Australia\n~ 0.36 + 0.16 = 0.52",
+                                      "~ Dramatic win in penalty\nshotout vs Holland\n~ 0.52 + 0.16 = 0.68",
+                                    "~ Comfortable win\nagainst Croatia.\n~ 0.68 + 0.16 = 0.84",
+                                    "~ The 'Scaloneta' wins\nthe craziest WC final\n~ 0.84 + 0.16 = 1"), 
+     x_coord = c(0.5, 1.5, 2.5, 
+                 3.5, 4.5, 5.5), 
+     y_coord = c(0.3, 0.46, 0.62,
+                 0.78, 0.94, 1.1))
+
+s_points_ip <- c(0.2, 0.36, 0.52, 0.68, 0.84, 1)
+achieved_stage_ip <- c("Qualified", "Last 16", "Quarter finals", "Semi finals", "Final", "CHAMPS!!")
+achieved_stage_ip <- factor(achieved_stage_ip, levels = c("Qualified", "Last 16", "Quarter finals", "Semi finals", "Final", "CHAMPS!!"))
+
+ip_df <- data.frame(s_points_ip, achieved_stage_ip)
+
+path_wc_0 <- "C://Users//santi//Desktop//wc_success_cup.png"
+img_wc_0 <- image_read(path = path_wc_0) %>% image_scale(., "x400") 
+
+img_wc_1 <- img_wc_0 %>% image_trim()
+
+img_cred <- data.frame(
+  imagery_tag = c("World Cup"),
+  imagery_credit = c("Toppng.com"),
+  imagery_link = c("https://toppng.com/free-image/trophy-world-cup-PNG-free-PNG-Images_8447"))
+
+path_saint_1 <- "C://Users//santi//Desktop//saint_analytics//logo(s)//saint_analytics(11).png"
+
+img_saint_01 <- image_read(path = path_saint_1) %>% image_scale(., "x500")
+
+img_saint_1 <- img_saint_01 %>% image_trim()
+
+pen <- readPNG("C://Users//santi//Desktop//saint_analytics//logo(s)//saint_analytics(11.bis).png") %>% as.raster()
+
+```
+
+## **Visuals**
+
+### **WCS_I example**
+```{r index visual, fig.align='center', fig.height=7, fig.width=11}
+
+ggplot(ip_df, aes(x = achieved_stage_ip, y = s_points_ip)) +
+  geom_col(fill = "#3399CC", alpha = 0.6) +
+  scale_y_continuous(limits = c(-0.04,1.3), breaks = s_points_ip) +
+  labs(title = "How WCS_I works", 
+       subtitle = "WCS_I applied to current world champions: Argentina (a.k.a 'La Scaloneta')",
+       x = '',
+       y = "WCS_I") + 
+  theme(plot.title = element_text(size = 18, face = 'bold', hjust = 0), 
+        plot.subtitle = element_text(size = 14, face = 'bold', hjust = 0),
+        axis.text = element_text(size = 14), axis.ticks.y = element_blank(), 
+        panel.grid.major.y = element_line(color = 'gray', linewidth = .25, 
+                                          linetype = "dashed"), 
+        panel.background = element_blank()) +
+  geom_segment(data = data.frame(x = 1, xend = 5.8, y = -.04, yend = -.04), 
+               aes(x = x, xend = xend, y = y, yend = yend), 
+           color = "#3399CC", alpha = 0.85,
+           linewidth = 4, linejoin = c('mitre'),
+           arrow = arrow(angle = 10, length = unit(0.4,'inches'))) +
+  draw_image(img_wc_1, x = 5.5, y = 1, height = .25, scale = 1) +
+  geom_label(data = arg_expl_summ_df[1,], 
+             aes(x = 1, 
+                 y = y_coord -0.18,  label = summ), 
+             fill = "#3399CC", alpha = 0.1, size = 3) + 
+  geom_label(data = arg_expl_summ_df[-1,], 
+             aes(x = c(1,2,3,4,5), 
+                 y = y_coord -0.18,  label = summ), 
+             fill = "#3399CC", alpha = 0.6, size = 3) +
+  annotation_custom(img_saint_1 %>% rasterGrob(), 
+                    xmin=5.2, xmax=6.2, ymin=1.35, ymax=1.55) +
+  coord_cartesian(clip = "off")
+
+
+```
+
+```{r map n table dataset}
+
+wc_map <- inner_join(wc_all_s_points, wc_all_labeled_wide %>% group_by(wc_countries) %>% 
+             filter(., n == max(n)) %>% select(., wc_countries, n), by = "wc_countries") %>% 
+  inner_join(., wc_all_labeled_long %>% count(wc_countries), by = "wc_countries")
+
+uk_agg <- wc_map %>% filter(., wc_countries %in% c("England", "Scotland", "Wales")) %>% bind_cols(., cont = rep("United Kingdom", 3))
+
+uk_agg.1 <- aggregate(wc_map %>% filter(., wc_countries %in% c("England", "Scotland", "Wales")) %>% .[,2:4], 
+          by = list(wc_countries = uk_agg$cont), FUN = sum)
+
+uk_agg.2 <- uk_agg.1 %>% mutate(., n.x = 4, n.y = 7) # basically, england "carries football" in britain.
+
+wc_map <- wc_map %>% bind_rows(., uk_agg.2)
+
+ # Add stages
+
+max_stage <- character(0) 
+ 
+for (i in wc_map$n.x) {
+   if (i == 1 ) {
+   max_stage <- c(max_stage, "Group stage")
+ } else if (i == 2) {
+   max_stage <- c(max_stage, "Last 16")
+ } else if (i == 3) {
+   max_stage <- c(max_stage, "Quarter finals")
+ } else if (i == 4) {
+   max_stage <- c(max_stage, "Semi finals")
+ } else if (i == 5) {
+   max_stage <- c(max_stage, "Final")
+ } else if (i == 6) {
+   max_stage <- c(max_stage, "WC Winners")
+ }
+}
+
+winners <- numeric(0) 
+ 
+for (i in wc_map$wc_countries) {
+   if (i == "Argentina" ) {
+   winners <- c(winners, 1)
+ } else if (i == "Brazil") {
+   winners <- c(winners, 1)
+ } else if (i == "France") {
+   winners <- c(winners, 2)
+ } else if (i == "Germany") {
+   winners <- c(winners, 1)
+ } else if (i == "Italy") {
+   winners <- c(winners, 1)
+ } else if (i == "Spain") {
+   winners <- c(winners, 1)
+ } else 
+   winners <- c(winners, 0)
+   }
+
+wc_map <- bind_cols(wc_map, "max_stage" = max_stage, "wc_wins" = winners)
+
+  # Detect rebels
+
+# left_join(st_transform(ne_countries(scale = 'medium', type = 'countries', returnclass = 'sf') %>%
+#                           select("name_long", "name", "continent")), wc_map, 
+#            by = c("name" = "wc_countries")) %>% filter(continent == "North America") %>% View()
+# 
+# anti_join(wc_map, st_transform(ne_countries(scale = 'medium', type = 'countries', 
+#                                             returnclass = 'sf')) %>% 
+#   select("name_long", "name", "continent"), 
+#   by = c("wc_countries" = "name")
+#   )
+
+  # Korea Republic (south korea) = Republic of Korea (long) ; Korea (name)
+  # IR Iran = Iran (long) ; Iran (name)
+  # Türkiye  = Turkey (long) ; Turkey (name)
+  # China PR  = China (long) ; China (name)
+  # Korea DPR  = 	Dem. Rep. Korea (long) ; 	Dem. Rep. Korea (name)
+  # Rep. of Ireland  = 	Ireland (long) ; 	Ireland (name)
+  # Bosnia & Herz'na  = 	Bosnia and Herzegovina (long) ; 	Bosnia and Herz. (name)
+  # Czech Republic  = 		Czech Republic (long) ; Czech Rep. (name)
+  # Trin & Tobago  = 	Trinidad and Tobago (long) ; Trinidad and Tobago (name)
+
+  # replacing "rebels" manually...
+
+rebels_list <- c("Korea Republic", "IR Iran", "Türkiye", "Rep. of Ireland", "Bosnia & Herz'na", "China PR", "Czech Republic", "Korea DPR",  "Trin & Tobago")
+
+reb_corrected_list <- c("Korea", "Iran", "Turkey", "Ireland", "Bosnia and Herz.", "China", "Czech Rep.", "Dem. Rep. Korea", "Trinidad and Tobago")
+
+wc_map[1] <- sapply(wc_map[1], function(o)
+  replace(o, o %in% rebels_list, reb_corrected_list))
+
+ISO_tab <- read.xlsx("C://Users//santi//Desktop//saint_analytics//projects_&_work//saint_sports//wc_success//ISO_tab.xlsx")
+
+wc_map_wcs_i <- st_transform(ne_countries(scale = 'medium', type = 'countries', 
+                                          returnclass = 'sf')) %>%
+           select("name", "continent") %>%
+  left_join(.,  wc_map, by = c("name" = "wc_countries")) %>% 
+  left_join(., ISO_tab, by = c("name" = "countries"))
+
+wc_map_wcs_i$sum_s_points <- replace_na(wc_map_wcs_i$sum_s_points, 0) 
+
+text_map <- paste(wc_map_wcs_i$name, '\n',
+  "WCS_I: ", wc_map_wcs_i$sum_s_points, '\n', 
+  "WC Played (n): ", wc_map_wcs_i$n.y, '\n', 
+  "Max. stage reached: ", wc_map_wcs_i$max_stage, '\n', 
+  "WC Won (n): ", wc_map_wcs_i$wc_wins) %>%
+  lapply(htmltools::HTML)
+
+wc_map <-  wc_map %>% left_join(., wc_map_wcs_i %>% select(., name, continent), 
+                      by = c("wc_countries" = "name")) %>% mutate(continent = replace_na(continent, "Europe")) # Only 'cause I know NAs came for europeans
+
+# path_xlsx.s <- "C://Users//santi//Desktop//saint_analytics//projects_&_work//saint_sports//wc_success"
+#  
+# list_datasets <- list(wc_map, ISO_tab)
+#  
+# lapply(list_datasets, function(o){ 
+#   write.xlsx(o, path_xlsx.s)  
+#  })
+# 
+# read.xlsx("C://Users//santi//Desktop//saint_analytics//projects_&_work//saint_sports//wc_success//wc_map.xlsx")
+
+
+```
+
+### **WCS_I results: Map and Table**
+
+```{r clorophert map n table, fig.height=5, fig.width=9, fig.align='center'}
+
+
+p <- list(projection = list(type = 'natural earth'), 
+          showcountries = TRUE, countrycolor = "black", 
+          showland = TRUE, landcolor = "white")
+
+
+plot_geo(wc_map_wcs_i, locationmode = 'code', locations = ~ISO_codes) %>% 
+  add_trace(z = ~sum_s_points, text = text_map, hoverinfo = "text", 
+            color = ~sum_s_points, colors = 'Blues', 
+            marker = list(line = list(color = "green", width = .5))) %>% 
+  add_annotations(text = paste("~ 5 countries where excluided from the map: England, Scotland, Serbia & Montenegro, Yugoslavia, and Wales.", "* British could not be set appart, and thus were aggregated as United Kingdom in the map.","* Serbia & Montenegro, and Yugoslavia don't exist anymore.", sep = "\n"), showarrow = F, x = .5, y = -0.1) %>%
+  colorbar(title = "Index sum", x = 1, y = .8) %>% 
+  layout(title = paste("<b>WCS_I around the globe<br>(1998 - 2022)</b>"), geo = p,
+         images = list(list(source = raster2uri(pen), 
+                             xref = "paper", yref = "paper", x= .85, y= 1.06, 
+                             sizex = .17, sizey = .14)))
+
+
+```
+
+
+
+```{r clorophert table}
+
+reactable(wc_map %>% select(., wc_countries, continent, sum_s_points) %>% 
+            filter(., !wc_countries == "United Kingdom"), 
+          pagination = F, height = 255, width = 480, filterable = TRUE,
+          outlined = TRUE, striped = TRUE,
+          columns = list(
+            wc_countries = colDef(name = "Countries", width = 180),
+            continent = colDef(name = "Continent", width = 180),
+            sum_s_points = colDef(name = "WCS_I", width = 100, align = "center")), 
+          theme = reactableTheme(searchInputStyle = list(width = "100%")))
+
+```
+
+## **Appendix**
+  
+```{r, include=FALSE}
+succ_text <- c("Success in victory...?", "Success in defeat...?", "Loose, yet\ndominating the game?",
+               "Win while\nbeing dominant?",
+               "Win regardless of\nwho's dominant?",
+               "Winning without\ndominance?", 
+               "What is dominance...?", 
+               "Take more chances\nthan the opponent?", 
+               "Control the game's\nmain instrument (the ball)?", 
+               "Impose tactics\nover the opponents'?") 
+
+
+could_nt <- c("Could be", "Shouldn't be", "Shouldn't be", rep("Could be", 3), 
+              rep("Dominance...?", 4))
+
+coord_y_succ <- c(8.5, 8.5, rep(6.25,4), 3, rep(1,3))
+coord_x_succ <- c(28, 6.5, 6.5, 19.5, 28, 36.5, 20, 7, 20, 33)
+
+
+figi <- ggplot() +  
+  geom_segment(data = data.frame(x = c(6.5, rep(28, 3), rep(20, 3)),
+                                 xend = c(6.5, 20, 28, 36, 7, 20, 33),
+                                 y = c(rep(8.5,4), rep(3, 3)), 
+                                  yend = c(rep(6.5, 4), rep(1.5, 3))), 
+                aes(x = x, xend = xend, y = y, yend = yend), 
+            color = "black", alpha = .7,
+            linejoin = c('round'), linewidth = 1.5,
+            arrow = NULL) +  
+  geom_segment(data = data.frame(x = c(0.1, 41, rep(0.1,3)),
+                                 xend = c(0.1, 41, rep(41,3)),
+                                 y = c(rep(0.1, 2),0.1, 10, 4), 
+                                  yend = c(rep(10, 2), 0.1, 10, 4)), 
+                aes(x = x, xend = xend, y = y, yend = yend), 
+            color = "black", 
+            linejoin = c('round'),
+            arrow = NULL) +  
+  geom_label(data = data.frame(coord_x_succ, coord_y_succ, succ_text, could_nt), 
+             aes(x = coord_x_succ, y = coord_y_succ, label = succ_text, 
+                 fill = could_nt), size = 3.2) + 
+  geom_point(aes(x = 14, y = 4), size = 4, color = "black", alpha = .8) +
+  geom_segment(aes(x = 14, y = 10, xend = 14, yend = 4), 
+               color = "black", linetype = "dashed") + 
+  ylim(0,10) + xlim(0,41.5) + 
+  labs(title = "'What is success in football?'",
+       subtitle = "Understanding the complexity of the question in hand", 
+       caption = paste("A great question takes to another great question, to define\n success, one has to deinfe dominance")) + theme_void() +
+  theme(plot.title.position = "plot", plot.title = element_text(hjust = 0),
+        plot.subtitle = element_text(hjust = 0), 
+        plot.margin = margin(0, 0, 0, .3, "cm"), 
+        plot.caption = element_text(hjust = 0),
+        plot.caption.position = "panel", 
+        axis.text = element_blank(), axis.ticks = element_blank(), 
+        axis.title = element_blank(), legend.position = "none") +
+  annotation_custom(img_saint_1 %>% rasterGrob(), 
+                    xmin=32, xmax=41, ymin=9.2, ymax=13.4) +
+  coord_cartesian(clip = "off")
+  
+```
+
+### **Success...?**
+
+
+```{r pressure, echo=FALSE, fig.width=6, fig.height=4.2}
+figi
+```
+
+
+### **2nd Map (with higher resolution)**
+  
+```{r clorophert map II, fig.height=5, fig.width=9, fig.align='center'}
+g <- list(projection = list(type = 'natural earth'), 
+           showcountries = TRUE, countrycolor = "black", 
+          showland = TRUE, landcolor = "white" , resolution = 50)
+
+plot_geo(wc_map_wcs_i, locationmode = 'code', locations = ~ISO_codes) %>% 
+  add_trace(z = ~sum_s_points, text = text_map, hoverinfo = "text", 
+            color = ~sum_s_points, colors = 'Greens', 
+            marker = list(line = list(color = "green", width = .5))) %>% 
+  add_annotations(text = paste("~ 5 countries where excluided from the map: England, Scotland, Serbia & Montenegro, Yugoslavia, and Wales.", "* British could not be set appart, and thus were aggregated as United Kingdom in the map.","* Serbia & Montenegro, and Yugoslavia don't exist anymore.", sep = "\n"), showarrow = F, x = .5, y = -0.1) %>%
+  colorbar(title = "Index sum", x = 1, y = .8) %>% 
+  layout(title = paste("<b>WCS_I around the globe<br>(1998 - 2022)</b>"), geo = g,
+         images = list(list(source = raster2uri(pen), 
+                             xref = "paper", yref = "paper", x= .85, y= 1.06, 
+                             sizex = .17, sizey = .14)))
+
+
+```
+
+### **data sets**
+
+  * **Map dataset**
+
+```{r table I}
+
+wc_map_wcs_i %>% select(., -c(n.x, n.y)) %>% datatable(rownames = F, 
+                              extensions = 'Buttons',
+                              options = list(dom = 'Blfrtip',
+                                             buttons = c('copy', 'csv', 'excel'), 
+                           pageLength = 4, lengthMenu = c(1, 2, 4)))
+
+
+
+```
+
+  * **Summary dataset**
+  
+```{r table II}
+
+wc_map %>% select(., -c(n.x, n.y)) %>% datatable(rownames = F, 
+                              extensions = 'Buttons',
+                              options = list(dom = 'Blfrtip',
+                                             buttons = c('copy', 'csv', 'excel'), 
+                           pageLength = 4, lengthMenu = c(4, 8, 12)))
+
+
+
+```
+  
+  * **Long dataset**
+  
+```{r table III}
+
+wc_all_labeled_long %>% select(., -n) %>% datatable(rownames = F, 
+                              extensions = 'Buttons',
+                              options = list(dom = 'Blfrtip',
+                                             buttons = c('copy', 'csv', 'excel'), 
+                           pageLength = 4, lengthMenu = c(4, 8, 12)))
+
+
+
+```
+  
+  * **Wide dataset**
+
+```{r table IV}
+
+wc_all_labeled_wide_sum %>% select(., -n) %>% datatable(rownames = F, 
+                              extensions = 'Buttons',
+                              options = list(dom = 'Blfrtip',
+                                             buttons = c('copy', 'csv', 'excel'), 
+                           pageLength = 4, lengthMenu = c(4, 8, 12)))
+
+
+
+```
+
+### **imagery credits**
+
+```{r table V}
+
+
+
+reactable(img_cred, pagination = FALSE, highlight = TRUE, 
+          height = 175,
+          columns = list(
+    imagery_tag = colDef(name = "Image label"),
+    imagery_credit = colDef(name = "Credits (w/link)", 
+                            html = TRUE, 
+                            cell = function(value, index) {
+      sprintf('<a href="%s" target="_blank">%s</a>', img_cred$imagery_link[index], value)
+    }), 
+    imagery_link = colDef(show = F) 
+  )
+)
+
+
+
+```
