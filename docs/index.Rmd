@@ -261,7 +261,7 @@ wc_all_labeled_wide_sum <- aggregate(wc_all_labeled.1[,2:9],
 
 
  * **Context**
-    * This project belongs to **Santiago Florimonte's portfolio**, and is part of **saint_analytics**, a business idea in the making.
+    * This document puts together the visuals used in [World cup success index (WCS_I) Project](https://santdata.github.io/wc_success_sfportfolio/), which belongs to **Santiago Florimonte’s portfolio**, and is part of **saint_analytics**, a business idea in the making.
  * **What you'll find**
     * Visuals around a success index for the most popular sports competition of all: The FIFA world cup
     * Tables containing datasets for the visuals, sources, and credits
